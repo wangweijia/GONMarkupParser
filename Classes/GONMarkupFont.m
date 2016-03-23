@@ -23,21 +23,25 @@
 #pragma mark - Style
 - (void)openingMarkupFound:(NSString *)tag configuration:(NSMutableDictionary *)configurationDictionary context:(NSMutableDictionary *)context attributes:(NSDictionary *)dicAttributes
 {
-    NSString *value;
+    BOOL noParameter = YES;
 
-    //Font color
-    if ([dicAttributes objectForKey:GONMarkupFont_TAG_color_ATT]) {
-        UIColor *colorValue = [[dicAttributes objectForKey:GONMarkupFont_TAG_color_ATT] representedColor];
+    // Font 'color'
+    if ([dicAttributes objectForKey:GONMarkupFont_TAG_color_ATT])
+    {
+        NSString *value = [dicAttributes objectForKey:GONMarkupFont_TAG_color_ATT];
+        UIColor *colorValue = [value representedColor];
         if (colorValue)
         {
             [configurationDictionary setObject:colorValue forKey:NSForegroundColorAttributeName];
         }
+        
+        noParameter = NO;
     }
     
-    // Font name
-    value = [dicAttributes objectForKey:GONMarkupFont_TAG_name_ATT];
-    if (value)
+    // Font 'name'
+    if ([dicAttributes objectForKey:GONMarkupFont_TAG_name_ATT])
     {
+        NSString *value = [dicAttributes objectForKey:GONMarkupFont_TAG_name_ATT];
         // Look for size attribute
         CGFloat size;
         NSString *sizeValue = [dicAttributes objectForKey:GONMarkupFont_TAG_size_ATT];
@@ -71,13 +75,12 @@
         [configurationDictionary setObject:font
                                      forKey:NSFontAttributeName];
 
-        return;
+        noParameter = NO;
     }
-
-    // Font size only
-    value = [dicAttributes objectForKey:GONMarkupFont_TAG_size_ATT];
-    if (value)
+    // Font 'size' and no 'name'
+    else if ([dicAttributes objectForKey:GONMarkupFont_TAG_size_ATT])
     {
+        NSString *value = [dicAttributes objectForKey:GONMarkupFont_TAG_size_ATT];
         // Extract size
         CGFloat size = [value floatValue];
 
@@ -99,11 +102,14 @@
         [configurationDictionary setObject:currentFont
                                      forKey:NSFontAttributeName];
 
-        return;
+        noParameter = NO;
     }
-
+    
     // Empty font parameter, reset configuration
-    [configurationDictionary removeObjectForKey:NSFontAttributeName];
+    if (noParameter)
+    {
+        [configurationDictionary removeObjectForKey:NSFontAttributeName];
+    }
 }
 
 @end
